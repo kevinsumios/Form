@@ -44,14 +44,6 @@ static const CGFloat FORMKeyboardAnimationDuration = 0.3f;
 
 @implementation FORMDataSource
 
-#pragma mark - Dealloc
-
-- (void)dealloc {
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center removeObserver:self name:UIKeyboardDidShowNotification object:nil];
-    [center removeObserver:self name:UIKeyboardDidHideNotification object:nil];
-}
-
 #pragma mark - Initializers
 
 - (instancetype)initWithJSON:(id)JSON
@@ -74,16 +66,6 @@ static const CGFloat FORMKeyboardAnimationDuration = 0.3f;
                                  initialValues:values
                               disabledFieldIDs:@[]
                                       disabled:disabled];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardDidShow:)
-                                                 name:UIKeyboardDidShowNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardDidHide:)
-                                                 name:UIKeyboardDidHideNotification
-                                               object:nil];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:FORMHideTooltips
                                                         object:@(!disabled)];
@@ -810,36 +792,6 @@ static const CGFloat FORMKeyboardAnimationDuration = 0.3f;
 
 - (BOOL)groupIsCollapsed:(NSInteger)group {
     return [self.collapsedGroups containsObject:@(group)];
-}
-
-#pragma mark - Keyboard Support
-
-- (void)keyboardDidShow:(NSNotification *)notification {
-    CGRect keyboardEndFrame;
-    [(notification.userInfo)[UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
-
-    NSInteger height = CGRectGetHeight(keyboardEndFrame);
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0) {
-        if ([[UIDevice currentDevice] hyp_isLandscape]) {
-            height = CGRectGetWidth(keyboardEndFrame);
-        }
-    }
-
-    UIEdgeInsets inset = self.originalInset;
-    inset.bottom += height;
-
-    [UIView animateWithDuration:FORMKeyboardAnimationDuration animations:^{
-        self.collectionView.contentInset = inset;
-    }];
-}
-
-- (void)keyboardDidHide:(NSNotification *)notification {
-    CGRect keyboardEndFrame;
-    [(notification.userInfo)[UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
-
-    [UIView animateWithDuration:FORMKeyboardAnimationDuration animations:^{
-        self.collectionView.contentInset = self.originalInset;
-    }];
 }
 
 #pragma mark - FORMHeaderViewDelegate

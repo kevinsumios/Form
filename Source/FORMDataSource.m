@@ -157,6 +157,7 @@ static const CGFloat FORMKeyboardAnimationDuration = 0.3f;
             break;
 
         case FORMFieldTypeSelect:
+        case FORMFieldTypeMultiselect:
             identifier = [NSString stringWithFormat:@"%@-%@", FORMSelectFormFieldCellIdentifier, field.fieldID];
             [collectionView registerClass:[FORMSelectFieldCell class]
                forCellWithReuseIdentifier:identifier];

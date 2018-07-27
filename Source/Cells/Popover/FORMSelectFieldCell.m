@@ -51,11 +51,15 @@ static const NSInteger FORMSelectMaxItemCount = 6;
         } else {
             self.fieldValueLabel.text = nil;
 
-            for (FORMFieldValue *fieldValue in field.values) {
-                if ([fieldValue identifierIsEqualTo:field.value]) {
-                    field.value = fieldValue;
-                    self.fieldValueLabel.text = fieldValue.title;
-                    break;
+            if(field.type == FORMFieldTypeMultiselect){
+                self.fieldValueLabel.text = field.value;
+            }else{
+                for (FORMFieldValue *fieldValue in field.values) {
+                    if ([fieldValue identifierIsEqualTo:field.value]) {
+                        field.value = fieldValue;
+                        self.fieldValueLabel.text = fieldValue.title;
+                        break;
+                    }
                 }
             }
         }
@@ -97,7 +101,9 @@ static const NSInteger FORMSelectMaxItemCount = 6;
 
     [self validate];
 
-    [fieldValuesTableViewController dismissViewControllerAnimated:YES completion:nil];
+    if (self.field.type == FORMFieldTypeSelect) {
+        [fieldValuesTableViewController dismissViewControllerAnimated:YES completion:nil];
+    }
 
     if ([self.delegate respondsToSelector:@selector(fieldCell:updatedWithField:)]) {
         [self.delegate fieldCell:self updatedWithField:self.field];

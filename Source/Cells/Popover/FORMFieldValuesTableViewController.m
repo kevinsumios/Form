@@ -6,6 +6,7 @@
 @interface FORMFieldValuesTableViewController ()
 
 @property (nonatomic) NSArray *values;
+@property NSMutableArray *selectedValues;
 
 @end
 
@@ -41,6 +42,16 @@
 
     self.values = [NSArray arrayWithArray:field.values];
     self.headerView.field = field;
+    
+    if(field.type == FORMFieldTypeMultiselect){
+        NSString *stringValues = self.field.value;
+        if([stringValues isKindOfClass:[NSString class]]){
+            self.selectedValues = [[NSMutableArray alloc] initWithArray:[stringValues componentsSeparatedByString:@","]];
+        }else{
+            self.selectedValues = [[NSMutableArray alloc] init];
+        }
+    }
+    self.tableView.allowsMultipleSelection = (field.type == FORMFieldTypeMultiselect);
     [self.tableView reloadData];
 }
 
@@ -135,16 +146,41 @@
     if ([self.field.value isKindOfClass:[FORMFieldValue class]]) {
         FORMFieldValue *currentFieldValue = self.field.value;
 
-        if ([currentFieldValue identifierIsEqualTo:fieldValue.valueID]) {
-            [tableView selectRowAtIndexPath:indexPath
-                                   animated:NO
-                             scrollPosition:UITableViewScrollPositionNone];
+        if (self.field.type == FORMFieldTypeMultiselect) {
+            NSString *stringValue = currentFieldValue.valueID;
+            if([stringValue containsString:fieldValue.valueID]){
+                [tableView selectRowAtIndexPath:indexPath
+                                       animated:NO
+                                 scrollPosition:UITableViewScrollPositionNone];
+                if(![self.selectedValues containsObject:[(FORMFieldValue*)self.values[indexPath.row] value]]){
+                    [self.selectedValues addObject:[(FORMFieldValue*)self.values[indexPath.row] value]];
+                }
+            }
+        }else{
+            if ([currentFieldValue identifierIsEqualTo:fieldValue.valueID]) {
+                [tableView selectRowAtIndexPath:indexPath
+                                       animated:NO
+                                 scrollPosition:UITableViewScrollPositionNone];
+            }
         }
     } else {
-        if ([fieldValue identifierIsEqualTo:self.field.value]) {
-            [tableView selectRowAtIndexPath:indexPath
-                                   animated:NO
-                             scrollPosition:UITableViewScrollPositionNone];
+        
+        if (self.field.type == FORMFieldTypeMultiselect) {
+            NSString *stringValue = self.field.value;
+            if([stringValue containsString:fieldValue.valueID]){
+                [tableView selectRowAtIndexPath:indexPath
+                                       animated:NO
+                                 scrollPosition:UITableViewScrollPositionNone];
+                if(![self.selectedValues containsObject:[(FORMFieldValue*)self.values[indexPath.row] value]]){
+                    [self.selectedValues addObject:[(FORMFieldValue*)self.values[indexPath.row] value]];
+                }
+            }
+        }else{
+            if ([fieldValue identifierIsEqualTo:self.field.value]) {
+                [tableView selectRowAtIndexPath:indexPath
+                                       animated:NO
+                                 scrollPosition:UITableViewScrollPositionNone];
+            }
         }
     }
 
@@ -152,9 +188,46 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    FORMFieldValue *fieldValue = self.values[indexPath.row];
-
+    FORMFieldValue *fieldValue;
     if ([self.delegate respondsToSelector:@selector(fieldValuesTableViewController:didSelectedValue:)]) {
+        
+        if(_field.type == FORMFieldTypeMultiselect){
+            if(![self.selectedValues containsObject:[(FORMFieldValue*)self.values[indexPath.row] value]]){
+                [self.selectedValues addObject:[(FORMFieldValue*)self.values[indexPath.row] value]];
+            }
+            fieldValue = [[FORMFieldValue alloc]init];
+            fieldValue.value = [self.selectedValues componentsJoinedByString:@","];
+            fieldValue.valueID = fieldValue.value;
+            fieldValue.title = [self.selectedValues componentsJoinedByString:@","];
+
+        }else{
+            fieldValue = self.values[indexPath.row];
+
+        }
+        
+        [self.delegate fieldValuesTableViewController:self
+                                     didSelectedValue:fieldValue];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+    FORMFieldValue *fieldValue;
+    if ([self.delegate respondsToSelector:@selector(fieldValuesTableViewController:didSelectedValue:)]) {
+        
+        if(_field.type == FORMFieldTypeMultiselect){
+            if([self.selectedValues containsObject:[(FORMFieldValue*)self.values[indexPath.row] value]]){
+                [self.selectedValues removeObject:[(FORMFieldValue*)self.values[indexPath.row] value]];
+            }
+            fieldValue = [[FORMFieldValue alloc]init];
+            fieldValue.value = [self.selectedValues componentsJoinedByString:@","];
+            fieldValue.valueID = fieldValue.value;
+            fieldValue.title = [self.selectedValues componentsJoinedByString:@","];
+
+        }else{
+            fieldValue = [[FORMFieldValue alloc]init];
+            
+        }
+        
         [self.delegate fieldValuesTableViewController:self
                                      didSelectedValue:fieldValue];
     }

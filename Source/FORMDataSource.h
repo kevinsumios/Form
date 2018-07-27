@@ -252,4 +252,6 @@ includingHiddenFields:(BOOL)includingHiddenFields
  */
 - (BOOL)groupIsCollapsed:(NSInteger)group;
 
+- (void)fieldCell:(UICollectionViewCell *)fieldCell updatedWithField:(FORMField *)field;
+
 @end

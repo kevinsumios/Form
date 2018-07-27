@@ -293,6 +293,19 @@ static NSString * const FORMTextFieldPlusButtonColorKey = @"plus_button_color";
 #pragma mark - Notifications
 
 - (void)textFieldDidUpdate:(UITextField *)textField {
+    
+    NSArray *currentar = [UITextInputMode activeInputModes];
+    UITextInputMode *current = [currentar firstObject];
+    
+    if ([current.primaryLanguage isEqualToString:@"zh-Hant"]||[current.primaryLanguage isEqualToString:@"zh-Hans"] ) {
+        UITextRange *selectedRange = [self markedTextRange];
+        UITextPosition *position = [self positionFromPosition:selectedRange.start offset:0];
+        
+        if (position){
+            return;
+        }
+    }
+    
     if (!self.isValid) {
         self.valid = YES;
     }

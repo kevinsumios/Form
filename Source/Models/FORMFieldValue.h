@@ -9,7 +9,7 @@
 @property (nonatomic, copy) NSString *info;
 @property (nonatomic) NSArray *targets;
 @property (nonatomic) FORMField *field;
-@property (nonatomic) NSNumber *value;
+@property (nonatomic) NSObject *value;
 @property (nonatomic) BOOL defaultValue;
 @property (nonatomic, copy) NSString *accessibilityLabel;
 

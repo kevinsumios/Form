@@ -28,7 +28,6 @@ static const CGFloat FORMDispatchTime = 0.05f;
 
 static NSString * const FORMDynamicAddFieldID = @"add";
 static NSString * const FORMDynamicRemoveFieldID = @"remove";
-static const CGFloat FORMKeyboardAnimationDuration = 0.3f;
 
 @interface FORMDataSource () <FORMBaseFieldCellDelegate, FORMHeaderViewDelegate>
 
@@ -84,12 +83,12 @@ static const CGFloat FORMKeyboardAnimationDuration = 0.3f;
 
     [self.formData.groups enumerateObjectsUsingBlock:^(FORMGroup *formGroup, NSUInteger idx, BOOL *stop) {
         if (formGroup.collapsed) {
-            if (![_collapsedGroups containsObject:@(idx)]) {
+            if (![self.collapsedGroups containsObject:@(idx)]) {
                 for (NSInteger i = 0; i < formGroup.fields.count; i++) {
                     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:idx];
                     [indexPaths addObject:indexPath];
                 }
-                [_collapsedGroups addObject:@(idx)];
+                [self.collapsedGroups addObject:@(idx)];
             }
         }
     }];

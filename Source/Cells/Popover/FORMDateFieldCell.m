@@ -219,7 +219,7 @@ static const CGSize FORMDatePhonePopoverSize = { 320.0f, 200.0f };
 
 - (void)fieldValuesTableViewController:(FORMFieldValuesTableViewController *)fieldValuesTableViewController
                       didSelectedValue:(FORMFieldValue *)selectedValue {
-    if ([selectedValue.value boolValue] == YES) {
+    if ([(NSNumber *)selectedValue.value boolValue] == YES) {
         self.field.value = self.datePicker.date;
     } else {
         self.field.value = nil;
